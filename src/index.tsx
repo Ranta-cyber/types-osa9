@@ -1,17 +1,98 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom";
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const App: React.FC = () => {
+  const courseName = "Half Stack application development";
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  // new types
+  interface CoursePartBase {
+    name: string;
+    exerciseCount: number;
+  }
+
+  interface CoursePartOne extends CoursePartBase {
+    name: "Fundamentals";
+    description: string;
+  }
+
+  interface CoursePartTwo extends CoursePartBase {
+    name: "Using props to pass data";
+    groupProjectCount: number;
+  }
+
+  interface CoursePartThree extends CoursePartBase {
+    name: "Deeper type usage";
+    description: string;
+    exerciseSubmissionLink: string;
+  }
+
+  type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree;
+
+  // this is the new coursePart variable
+  const courseParts: CoursePart[] = [
+    {
+      name: "Fundamentals",
+      exerciseCount: 10,
+      description: "This is an awesome course part"
+    },
+    {
+      name: "Using props to pass data",
+      exerciseCount: 7,
+      groupProjectCount: 3
+    },
+    {
+      name: "Deeper type usage",
+      exerciseCount: 14,
+      description: "Confusing description",
+      exerciseSubmissionLink: "https://fake-exercise-submit.made-up-url.dev"
+    }
+  ];
+
+  const Total = () => {
+    return (
+      <div>
+        <p>
+          Number of exercises{" "}
+          {courseParts.reduce((carry, part) => carry + part.exerciseCount, 0)}
+        </p>
+      </div>
+    )
+  }
+
+  const Content = () => {
+    return (
+      <div>
+        <p>
+          {courseParts[0].name} {courseParts[0].exerciseCount}
+        </p>
+        <p>
+          {courseParts[1].name} {courseParts[1].exerciseCount}
+        </p>
+        <p>
+          {courseParts[2].name} {courseParts[2].exerciseCount}
+        </p>
+      </div>
+    )
+  }
+
+  interface HeaderProps {
+    name: string;
+  }
+
+  const Header: React.FC<HeaderProps> = (props) => {
+    return (
+      <div>
+        <h1>{props.name}</h1>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      <Header name={courseName} />
+      <Content />
+      <Total />
+    </div>
+  );
+};
+

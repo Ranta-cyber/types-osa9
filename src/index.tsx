@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom";
+import { v4 as uuidv4 } from 'uuid';
 
 const App: React.FC = () => {
   const courseName = "Half Stack application development";
@@ -8,11 +9,15 @@ const App: React.FC = () => {
   interface CoursePartBase {
     name: string;
     exerciseCount: number;
+    id: string;
   }
 
-  interface CoursePartOne extends CoursePartBase {
+  interface Description extends CoursePartBase {
+    description?: string;
+  }
+
+  interface CoursePartOne extends Description {
     name: "Fundamentals";
-    description: string;
   }
 
   interface CoursePartTwo extends CoursePartBase {
@@ -20,33 +25,53 @@ const App: React.FC = () => {
     groupProjectCount: number;
   }
 
-  interface CoursePartThree extends CoursePartBase {
+  interface CoursePartThree extends Description {
     name: "Deeper type usage";
-    description: string;
     exerciseSubmissionLink: string;
   }
 
-  type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree;
+  interface CoursePartFour extends Description {
+    name: "Cyber course";
+  }
+
+  type CoursePart = CoursePartOne | CoursePartTwo | CoursePartThree
+    | CoursePartFour;
 
   // this is the new coursePart variable
   const courseParts: CoursePart[] = [
     {
       name: "Fundamentals",
       exerciseCount: 10,
-      description: "This is an awesome course part"
+      description: "This is an awesome course part",
+      id: uuidv4({})
     },
     {
       name: "Using props to pass data",
       exerciseCount: 7,
-      groupProjectCount: 3
+      groupProjectCount: 3,
+      id: uuidv4({})
     },
     {
       name: "Deeper type usage",
       exerciseCount: 14,
       description: "Confusing description",
-      exerciseSubmissionLink: "https://fake-exercise-submit.made-up-url.dev"
+      exerciseSubmissionLink: "https://fake-exercise-submit.made-up-url.dev",
+      id: uuidv4({})
+    },
+    {
+      name: "Cyber course",
+      exerciseCount: 10,
+      description: "My own course",
+      id: uuidv4({})
     }
   ];
+
+
+  const assertNever = (value: never): never => {
+    throw new Error(
+      `Unhandled discriminated union member: ${JSON.stringify(value)}`
+    );
+  };
 
   const Total = () => {
     return (
@@ -59,21 +84,66 @@ const App: React.FC = () => {
     )
   }
 
-  const Content = () => {
-    return (
-      <div>
-        <p>
-          {courseParts[0].name} {courseParts[0].exerciseCount}
-        </p>
-        <p>
-          {courseParts[1].name} {courseParts[1].exerciseCount}
-        </p>
-        <p>
-          {courseParts[2].name} {courseParts[2].exerciseCount}
-        </p>
-      </div>
-    )
+  const Part: React.FC<{ part: CoursePart }> = ({ part }) => {
+    console.log('part:', part)
+    switch (part.name) {
+      case 'Fundamentals':
+        return (
+          <div>
+            <p> {part.name} 
+             {part.exerciseCount}</p>
+            <p> {part.description}</p>
+          </div>
+        );
+      case 'Using props to pass data':
+        return (
+          <div>
+            <p> {part.name} 
+            {part.exerciseCount}</p>
+            <p>{part.groupProjectCount}</p>
+          </div >
+        );
+      case 'Deeper type usage':
+        return (
+          <div>
+            <p> {part.name} 
+             {part.exerciseCount}</p>
+            <p> {part.description}</p>
+            <p> {part.exerciseSubmissionLink}</p>
+          </div>
+        );
+      case 'Cyber course':
+        return (
+          <div>
+            <p> {part.name} </p>
+            <p> {part.exerciseCount}</p>
+            <p> {part.description}</p>
+          </div>
+        );
+      default:
+        return null
+      //return assertNever({ part });
+    }
+    return null
   }
+
+  const Content: React.FC<{ courseParts: CoursePart[] }> = ({ courseParts }) => {
+    courseParts.map((part) => (
+      console.log('parts2:', part)
+    ))
+    return (
+      <React.Fragment>
+        {courseParts.map((part) => (
+
+          // eslint-disable-next-line react/jsx-key
+          <div>
+            <Part  part={part} />
+          </div>
+        ))}
+      </React.Fragment>
+
+    );
+  };
 
   interface HeaderProps {
     name: string;
@@ -90,9 +160,10 @@ const App: React.FC = () => {
   return (
     <div>
       <Header name={courseName} />
-      <Content />
+      <Content courseParts={courseParts} />
       <Total />
     </div>
   );
 };
 
+ReactDOM.render(<App />, document.getElementById("root"));
